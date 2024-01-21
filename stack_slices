@@ -1,0 +1,30 @@
+#------------------------------------------------------
+# Stack 2D slices to generate 3D image
+# Author: Joachim Bron
+# Date: August 2023 
+#------------------------------------------------------
+
+# IMPORTS
+import numpy as np
+from skimage.transform import radon, iradon
+import cv2
+
+# FUNCTIONS DEFINITIONS
+def stack_2D_slices(sinograms, num_slices, x_dimension_slice, y_dimension_slice, num_projections, angle):
+    # here sinograms is an array containing all the indivual sinograms for each slice 
+    
+    # define angles at which projections were taken
+    theta = np.linspace(0., angle, num_projections)
+
+    # initialize 3d reconstruction array (dimensions are "number of slices" x "dimension in the x direction
+    # of a slice" x "dimension in the y direction of a slice" )
+    reconstructed3d = np.empty((num_slices, x_dimension_slice, y_dimension_slice))
+
+    # iterate over sinograms, perform inverse radon transform to get 2 slice, and stack the slices in 3d array
+    for i in range(0,num_slices):
+        print(f'i = {i}')
+        sinogram = sinograms[i]
+        slice2d = iradon(sinogram, theta=theta, filter_name='ramp')
+        reconstructed3d[i] = slice2d 
+    
+    return reconstructed3d
